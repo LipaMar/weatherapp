@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.google.android.material.textfield.TextInputEditText
@@ -24,8 +23,8 @@ import pl.edu.wsiz.weatherapp.network.ForecastDTO
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-
-const val WEATHER_UNIT = "metric"
+import java.text.SimpleDateFormat
+import java.util.*
 
 class FirstFragment() : Fragment(), KodeinAware {
 
@@ -75,7 +74,7 @@ class FirstFragment() : Fragment(), KodeinAware {
     }
 
     fun getCurrentWeather(city: String, view: View) {
-        val currentWeather = api.getCurrentWeather(city, WEATHER_UNIT, API_KEY)
+        val currentWeather = api.getCurrentWeather(city, API_KEY)
         var result: ForecastDTO? = null
         currentWeather.enqueue(object : Callback<ForecastDTO?> {
             override fun onResponse(call: Call<ForecastDTO?>, response: Response<ForecastDTO?>) {
@@ -83,8 +82,7 @@ class FirstFragment() : Fragment(), KodeinAware {
                 if (result == null) {
                     Toast.makeText(context, "Nie znaleziono miasta", Toast.LENGTH_LONG).show()
                 } else {
-                    val findViewById = view.findViewById<TextView>(R.id.textview_first)
-                    findViewById.text = "${result!!.main.feels_like}"
+                    populateDataOnScreen(view, result!!)
                 }
             }
 
@@ -92,6 +90,28 @@ class FirstFragment() : Fragment(), KodeinAware {
                 Log.d("apiCall", "onFailure: ${t.message}")
             }
         })
+    }
+
+    fun populateDataOnScreen(view: View, data: ForecastDTO) {
+        binding.address.text = "${data.name}, ${data.sys.country}"
+        binding.updatedAt.text = convertToDateTimeString(data.dt, PatternType.DATE_PATTERN)
+        binding.status.text =
+            data.weather[0].description.replaceFirstChar { c: Char -> c.uppercaseChar() }
+        binding.temp.text = data.main.temp.toString()
+        binding.tempMin.text = "Min temp: " + data.main.temp_min.toString()
+        binding.tempMax.text = "Max temp: " + data.main.temp_max.toString()
+        binding.sunrise.text = convertToDateTimeString(data.sys.sunrise, PatternType.TIME_PATTERN)
+        binding.sunset.text = convertToDateTimeString(data.sys.sunset, PatternType.TIME_PATTERN)
+        binding.wind.text = data.wind.speed.toString()
+        binding.pressure.text = data.main.pressure.toString()
+        binding.humidity.text = data.main.humidity.toString()
+        binding.feelsLike.text = data.main.feels_like.toString()
+
+
+    }
+
+    private fun convertToDateTimeString(field: Int, pattern: PatternType): String {
+        return SimpleDateFormat(pattern.value).format(Date(field.toLong() * 1000))
     }
 
     override fun onDestroyView() {

@@ -7,14 +7,16 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 const val BASE_URL = "https://api.openweathermap.org/data/2.5/"
+const val WEATHER_UNIT = "metric"
 
 interface ApiInterface {
 
     @GET("weather")
     fun getCurrentWeather(
         @Query("q") q: String,
-        @Query("units") units: String,
-        @Query("appid") appid: String
+        @Query("appid") appid: String,
+        @Query("units") units: String = WEATHER_UNIT,
+        @Query("lang") lang: String = "pl"
     ): Call<ForecastDTO>
 
     companion object {
