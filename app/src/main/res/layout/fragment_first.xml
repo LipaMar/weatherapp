@@ -34,8 +34,7 @@
                 android:text="@string/city"
                 android:textSize="24dp" />
             <TextView android:id="@+id/updated_at" android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:textSize="14dp"
-                android:text="20 April 2012, 20:08 PM"/>
+                android:layout_height="wrap_content" android:textSize="14dp"/>
         </LinearLayout>
 
 

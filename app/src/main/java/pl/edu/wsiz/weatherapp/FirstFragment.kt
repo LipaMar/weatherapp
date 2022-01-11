@@ -58,7 +58,7 @@ class FirstFragment() : Fragment(), KodeinAware {
             if (((event?.action ?: -1) == KeyEvent.ACTION_DOWN)
                 || keyCode == EditorInfo.IME_ACTION_DONE
             ) {
-                getCurrentWeather(cityInput.text.toString(), view)
+                getCurrentWeather(cityInput.text.toString())
                 view.hideSoftInput()
 
                 return@setOnEditorActionListener true
@@ -73,7 +73,7 @@ class FirstFragment() : Fragment(), KodeinAware {
         inputMethodManager.hideSoftInputFromWindow(windowToken, 0)
     }
 
-    fun getCurrentWeather(city: String, view: View) {
+    fun getCurrentWeather(city: String) {
         val currentWeather = api.getCurrentWeather(city, API_KEY)
         var result: ForecastDTO? = null
         currentWeather.enqueue(object : Callback<ForecastDTO?> {
@@ -82,7 +82,7 @@ class FirstFragment() : Fragment(), KodeinAware {
                 if (result == null) {
                     Toast.makeText(context, "Nie znaleziono miasta", Toast.LENGTH_LONG).show()
                 } else {
-                    populateDataOnScreen(view, result!!)
+                    populateDataOnScreen(result!!)
                 }
             }
 
@@ -92,20 +92,20 @@ class FirstFragment() : Fragment(), KodeinAware {
         })
     }
 
-    fun populateDataOnScreen(view: View, data: ForecastDTO) {
+    fun populateDataOnScreen(data: ForecastDTO) {
         binding.address.text = "${data.name}, ${data.sys.country}"
         binding.updatedAt.text = convertToDateTimeString(data.dt, PatternType.DATE_PATTERN)
         binding.status.text =
             data.weather[0].description.replaceFirstChar { c: Char -> c.uppercaseChar() }
-        binding.temp.text = data.main.temp.toString()
-        binding.tempMin.text = "Min temp: " + data.main.temp_min.toString()
-        binding.tempMax.text = "Max temp: " + data.main.temp_max.toString()
+        binding.temp.text = "${data.main.temp}°C"
+        binding.tempMin.text = "Min temp: ${data.main.temp_min}°C"
+        binding.tempMax.text = "Max temp: ${data.main.temp_max}°C"
         binding.sunrise.text = convertToDateTimeString(data.sys.sunrise, PatternType.TIME_PATTERN)
         binding.sunset.text = convertToDateTimeString(data.sys.sunset, PatternType.TIME_PATTERN)
-        binding.wind.text = data.wind.speed.toString()
-        binding.pressure.text = data.main.pressure.toString()
-        binding.humidity.text = data.main.humidity.toString()
-        binding.feelsLike.text = data.main.feels_like.toString()
+        binding.wind.text = "${data.wind.speed}m/s"
+        binding.pressure.text = "${data.main.pressure}hPa"
+        binding.humidity.text = "${data.main.humidity}%"
+        binding.feelsLike.text = "${data.main.feels_like}°C"
 
 
     }
